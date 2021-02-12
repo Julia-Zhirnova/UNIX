@@ -9,7 +9,7 @@
 void bubbleSort(int* arr, int size);
 void insertSort(int* a, int size);
 void selectSort(int* arr, int size);
-pid_t exec_in_fork(int size, void (*sfunc)(int*, int));
+pid_t exec_in_fork(int* arr, int size, void (*sfunc)(int*, int));
 
 
 int main() {
@@ -41,9 +41,9 @@ selectSort(ra, N);
 printf("\n"); */
 
     srand(time(0));
-    buble_sort_pid = exec_in_fork(N, bubbleSort);
-    insert_sort_pid = exec_in_fork(N, insertSort);
-    select_sort_pid = exec_in_fork(N, selectSort);
+    buble_sort_pid = exec_in_fork(ra, N, bubbleSort);
+    insert_sort_pid = exec_in_fork(ra, N, insertSort);
+    select_sort_pid = exec_in_fork(ra, N, selectSort);
     
     for (int i=0; i<3; ++i) {
         wait(&status);
@@ -110,21 +110,16 @@ void selectSort(int* arr, int size)
     }
 }
 
-pid_t exec_in_fork(int size, void (*sfunc)(int*, int)){
+pid_t exec_in_fork(int* arr, int size, void (*sfunc)(int*, int)){
     pid_t pid;
     clock_t time_start, time_stop;
-    int sort_arr[size];
     double exec_time;
-    
-    for (int i=0; i<size; ++i){
-        sort_arr[i] = rand();
-    }
     
     pid = fork();
     if (pid == 0){
         printf("%d started\n", getpid());
         time_start = clock();
-        sfunc(sort_arr, size);
+        sfunc(arr, size);
         time_stop = clock();
         exec_time = (double)(time_stop - time_start) / CLOCKS_PER_SEC;
         printf("%d: %f seconds\n", getpid(), exec_time);
